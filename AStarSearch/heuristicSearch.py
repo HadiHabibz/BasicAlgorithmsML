@@ -840,7 +840,6 @@ class HeuristicSearch( Search ):
     
 # end class HeuristicSearch
 
-
 myGraph = GraphBasics()
 HSsearch = HeuristicSearch( myGraph, startState, goalState )
 HSsearch.heuristicSearch()
