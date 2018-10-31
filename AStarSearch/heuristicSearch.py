@@ -4,8 +4,7 @@ from copy import copy, deepcopy
 from parse import *
 from heapq import *
 
-# startState = 11
-startState = 9
+startState = 11
 goalState = 6
 
 # This class holds the matrix represented using either
@@ -214,7 +213,8 @@ class GraphBasics:
         [0, 0, 0, 0, 2, 2, 0, 0, 0,  0, 0, 0],\
         [0, 0, 0, 3, 9, 0, 0, 0, 1,  0, 0, 0] ]
         
-#         # Undirected Weighted graph
+        # Undirected Weighted graph
+        # A graph with no path to the goal
 #         self.graphMatrix = [\
 #         [0, 2, 2, 0, 0, 0, 0, 0, 0,  0, 0, 0],\
 #         [2, 0, 0, 1, 0, 0, 0, 0, 0,  0, 0, 0],\
@@ -343,6 +343,16 @@ class Search:
             
     # end class goalStateIsReached
     
+    def failedToFindAPath( self ):
+        
+        # If there is no node left to go to, then the
+        # search is unsuccessful and it must be terminated
+        print( 'No path found!' )
+        self.reset()
+        return True 
+        
+    # end function failedToFindAPath
+    
     # Get all the possible paths we can take from the
     # current state. Save the paths in a queue from the
     # most desirable to the least desirable
@@ -431,6 +441,10 @@ class Search:
             # until either a dead is reached or the the goal state
             # is found
             self.goToTheNextState()
+            
+        # end while
+        
+        self.failedToFindAPath()
             
     # end function performSearch
     
