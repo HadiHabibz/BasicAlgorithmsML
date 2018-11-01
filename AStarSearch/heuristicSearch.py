@@ -407,14 +407,16 @@ class Search:
         # Handling the dead-ends and making transitions 
         # based on costs are algorithm specific. 
         if len( extractedNodes ) == 0:
-            self.resolveDeadend()
-            return False
-        
-        else:                    
+            extractedNodes.append( self.resolveDeadend() )
+            return
+             
+        if extractedNodes[0] >= 0:    
+             
             # Complete the transition
             self.makeTransition( extractedNodes )  
             return True
-                
+           
+        return False     
     # end function goToTheNextState
     
     # The major steps for all search algorithms are
@@ -642,7 +644,8 @@ class AStarSearch( Search ):
        
         # The state at the end of the fringe is the next
         # one to expand
-        alternativeState = alternativeFringe.pop();
+        alternativeState = alternativeFringe.pop()
+        alternativeFringe.append( alternativeState )
         
         # Keep fetching until a either the queue is empty
         # or an unexplored state is found in the queue
@@ -787,13 +790,13 @@ class HeuristicSearch( Search ):
     # previous state by extracting the next best
     # fringe (if it exists)
     def resolveDeadend( self ):
-    
+        
         # If this is a dead-end and there is no more
         # alternatives left to explore that the search
         # is unsuccessful
         if len( self.fringeStack ) == 0 :
             self.failure = True
-            return
+            return -1
             
         # Remove the bad fringe (dead-end) from the
         # fringe stack
@@ -803,8 +806,8 @@ class HeuristicSearch( Search ):
         # The search is not successful
         if len( self.fringeStack ) == 0 :
             self.failure = True
-            return
-                
+            return -1
+        
         # Remove the next fringe in the stack and
         # quickly return back, we just want to read it
         alternativeFringe = self.fringeStack.pop()
@@ -813,14 +816,16 @@ class HeuristicSearch( Search ):
         # The state at the end of the fringe is the next
         # one to expand
         alternativeState = alternativeFringe.pop();
+        alternativeFringe.append( alternativeState )
         
         if alternativeState in self.nodesVisited:
-            self.resolveDeadend()
-            return
-            
+            return self.resolveDeadend() 
+        
         # Go back to the parent node
         self.currentState = alternativeState 
+
         return alternativeState
+        
     # end function resolveDeadend
     
     # Print the path that is currently in the fringe
