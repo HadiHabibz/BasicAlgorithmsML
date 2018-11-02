@@ -8,6 +8,8 @@ class MinimaxSearch:
         self.tree = BinaryTree( 0, None )
         self.tree.initializeTree()
         self.currentNode = 0
+        self.alpha = -math.inf
+        self.beta = math.inf
                 
     # end Constructor
     
@@ -27,37 +29,37 @@ class MinimaxSearch:
     
     # end function isThisAgentMax
     
-    def getMaximumValue( self, tree ):
-        
-        leftChildValue = tree.getLeftChild().getNodeValue()
-        rightChildValue = tree.getRightChild().getNodeValue()
-        
-        if leftChildValue == None and\
-        rightChildValue == None:
-            return None
-        
-        if leftChildValue > rightChildValue:
-            return leftChildValue
-        
-        return rightChildValue
-        
-    # end function getMaximumValue
-    
-    def getMinimumValue( self, tree ):
-                
-        leftChildValue = tree.getLeftChild().getNodeValue()
-        rightChildValue = tree.getRightChild().getNodeValue()
-        
-        if leftChildValue == None and\
-        rightChildValue == None:
-            return None
-        
-        if leftChildValue > rightChildValue:
-            return rightChildValue
-        
-        return leftChildValue
-        
-    # end function getMinimumValue
+#     def getMaximumValue( self, tree ):
+#         
+#         leftChildValue = tree.getLeftChild().getNodeValue()
+#         rightChildValue = tree.getRightChild().getNodeValue()
+#         
+#         if leftChildValue == None and\
+#         rightChildValue == None:
+#             return None
+#         
+#         if leftChildValue > rightChildValue:
+#             return leftChildValue
+#         
+#         return rightChildValue
+#         
+#     # end function getMaximumValue
+#     
+#     def getMinimumValue( self, tree ):
+#                 
+#         leftChildValue = tree.getLeftChild().getNodeValue()
+#         rightChildValue = tree.getRightChild().getNodeValue()
+#         
+#         if leftChildValue == None and\
+#         rightChildValue == None:
+#             return None
+#         
+#         if leftChildValue > rightChildValue:
+#             return rightChildValue
+#         
+#         return leftChildValue
+#         
+#     # end function getMinimumValue
       
     def getStateValue( self, tree ):
         
@@ -69,31 +71,68 @@ class MinimaxSearch:
         
     # end function getStateValue
     
+    def updateIfNeedBe( self, valueOld, valueNew, tree ):
+        
+        if self.isThisAgentMax( tree.getRoot() ):
+            return max( valueOld, valueNew )
+        
+        return min( valueOld, valueNew )
+      
+    # end function updateIfNeedBe
+    
+    def getMaximumValue( self, tree ):
+        
+        runningMax = -math.inf
+        
+        leftChildValue = self.evaluateState( tree.getLeftChild() )
+        runningMax = max( runningMax, leftChildValue )
+        
+        rightChildValue = self.evaluateState( tree.getRightChild() )
+        runningMax = max( runningMax, rightChildValue )
+        
+        return runningMax
+        
+    # end function getMaximumValue
+    
+    def getMinimumValue( self, tree ):
+        
+        runningMin = math.inf
+        
+        leftChildValue = self.evaluateState( tree.getLeftChild() )
+        runningMin = min( runningMin, leftChildValue )
+        
+        rightChildValue = self.evaluateState( tree.getRightChild() )
+        runningMin = min( runningMin, rightChildValue )
+        
+        return runningMin
+        
+    # end function getMaximumValue
+    
     def evaluateState( self, tree = None ):
         
         if tree == None:
             tree = self.tree
-            
-        value = None
-
-        while True:
-            
-            value = self.getStateValue( tree )
-            
-            if value != None:
-                break
-            
-            if tree.getLeftChild() != None:
-                self.evaluateState( tree.getLeftChild() )
-                
-            if self.tree.getRightChild() != None:
-                self.evaluateState( tree.getRightChild() ) 
-                
-        # end while
         
+        if tree.getNodeValue() != None:
+            return tree.getNodeValue()    
+             
+        if self.isThisAgentMax( tree.getRoot() ):
+            value = self.getMaximumValue( tree )
+            
+        else:
+            value = self.getMinimumValue( tree )
+            
         tree.setNodeValue( value )
         
+        return tree.getNodeValue()
+        
     # end function evaluateState
+    
+    def minimaxSearchPruning( self ):
+        
+        self.tree.initializeTree()
+        
+    # end function minimaxSearchPruning
     
     def minimaxSearch( self ):
         
