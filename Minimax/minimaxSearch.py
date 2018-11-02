@@ -1,5 +1,6 @@
 from tree import *
 import math
+from concurrent.futures._base import RUNNING
 
 class MinimaxSearch:
     
@@ -27,58 +28,7 @@ class MinimaxSearch:
             
             turn = not turn
     
-    # end function isThisAgentMax
-    
-#     def getMaximumValue( self, tree ):
-#         
-#         leftChildValue = tree.getLeftChild().getNodeValue()
-#         rightChildValue = tree.getRightChild().getNodeValue()
-#         
-#         if leftChildValue == None and\
-#         rightChildValue == None:
-#             return None
-#         
-#         if leftChildValue > rightChildValue:
-#             return leftChildValue
-#         
-#         return rightChildValue
-#         
-#     # end function getMaximumValue
-#     
-#     def getMinimumValue( self, tree ):
-#                 
-#         leftChildValue = tree.getLeftChild().getNodeValue()
-#         rightChildValue = tree.getRightChild().getNodeValue()
-#         
-#         if leftChildValue == None and\
-#         rightChildValue == None:
-#             return None
-#         
-#         if leftChildValue > rightChildValue:
-#             return rightChildValue
-#         
-#         return leftChildValue
-#         
-#     # end function getMinimumValue
-      
-    def getStateValue( self, tree ):
-        
-        if self.isThisAgentMax( tree.getRoot() ):
-            return self.getMaximumValue( tree )
-            
-        else:
-            return self.getMinimumValue( tree )
-        
-    # end function getStateValue
-    
-    def updateIfNeedBe( self, valueOld, valueNew, tree ):
-        
-        if self.isThisAgentMax( tree.getRoot() ):
-            return max( valueOld, valueNew )
-        
-        return min( valueOld, valueNew )
-      
-    # end function updateIfNeedBe
+    # end function isThisAgentMax    
     
     def getMaximumValue( self, tree ):
         
@@ -108,6 +58,44 @@ class MinimaxSearch:
         
     # end function getMaximumValue
     
+    def getMaximumValueWithPruning( self, tree ):
+        
+        runningMax = -math.inf
+        
+        leftChildValue = self.evaluateState( tree.getLeftChild() )
+        runningMax = max( runningMax, leftChildValue )
+        
+        if runningMax >= self.beta:
+            return runningMax
+        
+        self.alpha = max( self.alpha, runningMax )
+        
+        rightChildValue = self.evaluateState( tree.getRightChild() )
+        runningMax = max( runningMax, rightChildValue )
+        
+        return runningMax
+        
+    # end function getMaximumValueWithPruning
+    
+    def getMinimumValueWithPruning( self, tree ):
+        
+        runningMin = math.inf
+        
+        leftChildValue = self.evaluateState( tree.getLeftChild() )
+        runningMin = min( runningMin, leftChildValue )
+        
+        if runningMin <= self.alpha:
+            return runningMin
+        
+        self.beta = min( self.beta, runningMin )
+        
+        rightChildValue = self.evaluateState( tree.getRightChild() )
+        runningMin = min( runningMin, rightChildValue )
+        
+        return runningMin
+        
+    # end function getMinimumValueWithPruning
+    
     def evaluateState( self, tree = None ):
         
         if tree == None:
@@ -128,11 +116,33 @@ class MinimaxSearch:
         
     # end function evaluateState
     
-    def minimaxSearchPruning( self ):
+    def evaluateStateWithPruning( self, tree = None ):
+        
+        if tree == None:
+            tree = self.tree
+        
+        if tree.getNodeValue() != None:
+            return tree.getNodeValue()    
+             
+        if self.isThisAgentMax( tree.getRoot() ):
+            value = self.getMaximumValueWithPruning( tree )
+            
+        else:
+            value = self.getMinimumValueWithPruning( tree )
+            
+        tree.setNodeValue( value )
+        
+        return tree.getNodeValue()
+        
+    # end function evaluateStateWithPruning
+    
+    def minimaxSearchWithPruning( self ):
         
         self.tree.initializeTree()
+        self.evaluateStateWithPruning()
+        self.tree.printTree()
         
-    # end function minimaxSearchPruning
+    # end function minimaxSearchWithPruning
     
     def minimaxSearch( self ):
         
@@ -146,3 +156,4 @@ class MinimaxSearch:
 
 searcher = MinimaxSearch()
 searcher.minimaxSearch()
+#searcher.minimaxSearchWithPruning()
